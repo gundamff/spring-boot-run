@@ -8,6 +8,7 @@
 ```
 .
 ├── run.sh
+├── jvm-options.sh
 ├── boot.properties
 └── app-web
    ├── boot.properties
@@ -16,6 +17,9 @@
 
 ### boot.properties
 该文件是run.sh的参数文件，run.sh会引用此文件，里面的参数只供run.sh使用，不设置为环境变量（避免污染环境变量）
+
+### jvm-options.sh
+jvm-options.sh 生成jvm参数 , 参考 [唯品会@江南白衣 JVM调优指南](https://github.com/vipshop/vjtools/blob/master/vjstar/src/main/script/jvm-options/jvm-options.sh)
 
 ### run.sh
 该脚本用来运行Spring Boot应用,程序部署时可以直接拷贝，根据服务的实际情况修改boot.properties即可
