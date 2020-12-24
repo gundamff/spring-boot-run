@@ -86,9 +86,11 @@ setServerPort() {
 start() {
     setServerPort
 
+    source ../jvm-options.sh
+
     BASE_ARGS="--spring.profiles.active=$PROFILES_ACTIVE "
 
-    RUN_EXE="$JAVA_EXE $JVM_ARGS -Dserver.port=$SERVER_PORT -jar $APP_JAR $BASE_ARGS  $OPT_ARGS"
+    RUN_EXE="$JAVA_EXE $JVM_ARGS $JAVA_OPTS -Dserver.port=$SERVER_PORT -jar $APP_JAR $BASE_ARGS  $OPT_ARGS"
     
     echo "--------------启动 $APP_NAME: 端口: $SERVER_PORT"
     echo $'\n\n\n'
@@ -107,7 +109,6 @@ start() {
         exit 0
     fi
 
-    echo "RUN_IN_DOCKER ================== $RUN_IN_DOCKER)"
     if ("$RUN_IN_DOCKER");then
         # 在docker内启动 不需要nohup
         echo "是否在docker内运行 = $RUN_IN_DOCKER"
@@ -121,7 +122,7 @@ start() {
          echo "是否在docker内运行 = $RUN_IN_DOCKER"
          #打印启动命令
          echo "-------Boot Command: "
-         echo "nohup $RUN_EXE >/dev/null 2>${LOG_DIR}/error.log &"
+         echo "nohup $RUN_EXE >${LOG_DIR}/error.log 2>&1 &"
          echo $'\n\n\n'
 
          #创建错误日志文件
@@ -133,12 +134,12 @@ start() {
     fi
     
     #记录pid到pid文件
-    echo $! >"$PID_FILE"
+    echo "$!" >"$PID_FILE"
 
     #命令执行异常，快速失败
-    sleep 0.5
+    sleep 1
     if (! isRunning); then
-        echoRed "Result: Start failed" && rm -f "$PID_FILE"
+        echoRed "1s Result: Start failed" && rm -f "$PID_FILE"
         echo $'\n\n\n'
         exit 1
     fi
@@ -146,15 +147,15 @@ start() {
     #启动几秒钟中后失败的情况，6秒内失败
     sleep 6
     if (! isRunning); then
-        echoRed "Result: Start failed" && rm -f "$PID_FILE"
+        echoRed "6s Result: Start failed" && rm -f "$PID_FILE"
         echo $'\n\n\n'
         exit 1
     fi
 
     #启动几秒钟中后失败的情况，10秒内失败
-    sleep 4
+    sleep 10
     if (! isRunning); then
-        echoRed "Result: Start failed" && rm -f "$PID_FILE"
+        echoRed "10s Result: Start failed" && rm -f "$PID_FILE"
         echo $'\n\n\n'
         exit 1
     fi

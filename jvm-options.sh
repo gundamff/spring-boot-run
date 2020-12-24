@@ -1,28 +1,20 @@
 
 #!/bin/bash
 
-# 使用指南：
-# 1. 修改本文件中的LOGDIR 和 APPID变量
-# 2. 根据实际情况需求，反注释掉一些参数。
-# 3. 修改应用启动脚本，增加 "source ./jvm-options.sh"，或者将本文件内容复制进应用启动脚本里.
-# 4. 修改应用启动脚本，使用输出的JAVA_OTPS变量，如java -jar xxx的应用启动语句，修改为 java $JAVA_OPTS -jar xxx。
-
-
 # change the jvm error log and backup gc log dir here
-LOGDIR="./logs"
+LOGDIR=${LOG_DIR}
 
 # change the appid for gc log name here
-APPID="myapp"
+APPID=$APP_NAME$_${SERVER_PORT}
 
 JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
-
 
 # Enable coredump
 ulimit -c unlimited
 
 ## Memory Options##
 
-MEM_OPTS="-Xms4g -Xmx4g -XX:NewRatio=1"
+MEM_OPTS="-XX:NewRatio=1"
 
 if [[ "$JAVA_VERSION" < "1.8" ]]; then
   MEM_OPTS="$MEM_OPTS -XX:PermSize=128m -XX:MaxPermSize=512m"
@@ -118,7 +110,7 @@ OPTIMIZE_OPTS="-XX:-UseBiasedLocking -XX:AutoBoxCacheMax=20000 -Djava.security.e
 
 
 # 关闭PerfData写入，避免高IO场景GC时因为写PerfData文件被阻塞，但会使得jstats，jps不能使用。
-#OPTIMIZE_OPTS="$OPTIMIZE_OPTS -XX:+PerfDisableSharedMem"
+OPTIMIZE_OPTS="$OPTIMIZE_OPTS -XX:+PerfDisableSharedMem"
 
 # 关闭多层编译，减少应用刚启动时的JIT导致的可能超时，以及避免部分函数C1编译后最终没被C2编译。 但导致函数没有被初始C1编译。
 #if [[ "$JAVA_VERSION" > "1.8" ]]; then     
@@ -126,7 +118,7 @@ OPTIMIZE_OPTS="-XX:-UseBiasedLocking -XX:AutoBoxCacheMax=20000 -Djava.security.e
 #fi
 
 # 如果希望无论函数的热度如何，最终JIT所有函数，关闭GC时将函数调用次数减半。
-#OPTIMIZE_OPTS="$OPTIMIZE_OPTS -XX:-UseCounterDecay"
+OPTIMIZE_OPTS="$OPTIMIZE_OPTS -XX:-UseCounterDecay"
 
 ## Trouble shooting Options##
 
