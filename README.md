@@ -10,9 +10,12 @@
 ├── run.sh
 ├── jvm-options.sh
 ├── boot.properties
-└── app-web
+└── {应用名}
    ├── boot.properties
-   └── app-web.jar
+   └── {应用名}.jar
+└── {另一个应用名}
+   ├── boot.properties
+   └── {另一个应用名}.jar
 ```
 
 ### jvm-options.sh
