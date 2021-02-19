@@ -43,8 +43,12 @@ if [[ -z $GROUPID ]];
 fi
 
 #应用JAR
-#APP_JAR="$(find "${APP_HOME}" -name "*.jar" 2>/dev/null | head -n 1)"
-APP_JAR="$APP_NAME.jar"
+#应用JAR
+if ("$RUN_IN_DOCKER");then
+   APP_JAR="$(find "${APP_HOME}" -name "*.jar" 2>/dev/null | head -n 1)"
+else
+   APP_JAR="$APP_NAME.jar"
+fi
 
 echoRed() { echo $'\e[0;31m'"$1"$'\e[0m'; }
 echoGreen() { echo $'\e[0;32m'"$1"$'\e[0m'; }
